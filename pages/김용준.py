@@ -6,182 +6,124 @@
     <title>수행평가 알림이</title>
     <style>
         body {
-            font-family: 'Malgun Gothic', sans-serif;
-            background-color: #1a1a1a;
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            font-family: sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            text-align: center;
             padding: 20px;
-            margin: 0;
         }
-        h1 {
-            color: #ffcc00;
-            margin-top: 40px;
-        }
-        .subject-container {
+        h1 { color: #ffcc00; }
+        .container {
             display: flex;
+            justify-content: center;
             gap: 20px;
             flex-wrap: wrap;
-            justify-content: center;
             margin-top: 30px;
         }
         .card {
-            background-color: #2a2a2a;
-            border-radius: 15px;
+            background-color: #1e1e1e;
+            border: 1px solid #333;
+            border-radius: 12px;
             padding: 20px;
-            width: 250px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            width: 240px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-        .subject-name {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        .fire-container {
-            height: 150px;
+        .subject { font-size: 1.4rem; font-weight: bold; margin-bottom: 15px; }
+        
+        /* 불꽃 표시 영역 */
+        .fire-zone {
+            height: 120px;
             display: flex;
             justify-content: center;
             align-items: flex-end;
             margin-bottom: 15px;
         }
-        /* 기본 불꽃 스타일 기본값 정의 */
-        .fire {
-            width: 40px;
-            height: 40px;
+        .fire-ball {
             border-radius: 50% 50% 20% 50%;
             transform: rotate(-45deg);
-            transition: all 0.5s ease;
+            transition: all 0.3s ease;
         }
-        /* 상태별 스타일 */
-        .none {
-            background-color: #444;
-            box-shadow: none;
-            border-radius: 50%;
-        }
-        .safe {
-            width: 40px; height: 40px;
-            background-color: #00ffaa;
-            box-shadow: 0 0 15px #00ffaa;
-        }
-        .warning {
-            width: 70px; height: 70px;
-            background-color: #ff9900;
-            box-shadow: 0 0 30px #ff9900;
-            animation: flicker 0.1s infinite alternate;
-        }
-        .danger {
-            width: 100px; height: 100px;
-            background-color: #ff3300;
-            box-shadow: 0 0 50px #ff3300;
-            animation: flicker 0.05s infinite alternate;
-        }
-        .expired {
-            background-color: #555;
-            box-shadow: none;
-            border-radius: 50%;
-        }
-        @keyframes flicker {
-            0% { transform: rotate(-45deg) scale(0.95); }
-            100% { transform: rotate(-45deg) scale(1.05); }
-        }
-        .d-day {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-top: 15px;
-        }
-        .input-group {
-            margin-top: 15px;
-        }
-        input[type="date"] {
-            padding: 8px;
-            border-radius: 5px;
-            border: none;
-            font-size: 0.9rem;
-        }
+        
+        /* 상태별 불꽃 (크기, 색상, 그림자) */
+        .state-none { width: 30px; height: 30px; background-color: #444; border-radius: 50%; transform: none; }
+        .state-safe { width: 40px; height: 40px; background-color: #00ffaa; box-shadow: 0 0 15px #00ffaa; }
+        .state-warning { width: 70px; height: 70px; background-color: #ff9900; box-shadow: 0 0 25px #ff9900; }
+        .state-danger { width: 100px; height: 100px; background-color: #ff3300; box-shadow: 0 0 40px #ff3300; }
+        .state-end { width: 30px; height: 30px; background-color: #555; border-radius: 50%; transform: none; }
+
+        .date-input { margin-top: 15px; }
+        input[type="date"] { padding: 6px; font-size: 0.9rem; border-radius: 4px; border: none; }
+        .dday-text { font-size: 1.1rem; font-weight: bold; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-    <h1>🔥 수행평가 마감 시기 알림이 🔥</h1>
-    <p>우리 모둠을 위한 수행평가 타임라인</p>
+    <h1>🔥 수행평가 알림이</h1>
+    <p>날짜를 입력하면 불꽃의 크기와 색상이 변합니다.</p>
 
-    <div class="subject-container">
+    <div class="container">
         <div class="card">
-            <div class="subject-name">📚 국어</div>
-            <div class="fire-container">
-                <div id="ko-fire" class="fire none"></div>
-            </div>
-            <div class="input-group">
-                <input type="date" id="ko-date" onchange="updateDday('ko')">
-            </div>
-            <div class="d-day" id="ko-text">날짜를 선택하세요</div>
+            <div class="subject">📚 국어</div>
+            <div class="fire-zone"><div id="ko-fire" class="fire-ball state-none"></div></div>
+            <div class="date-input"><input type="date" id="ko-date" onchange="calculate('ko')"></div>
+            <div id="ko-text" class="dday-text">날짜를 설정하세요</div>
         </div>
 
         <div class="card">
-            <div class="subject-name">📐 수학</div>
-            <div class="fire-container">
-                <div id="math-fire" class="fire none"></div>
-            </div>
-            <div class="input-group">
-                <input type="date" id="math-date" onchange="updateDday('math')">
-            </div>
-            <div class="d-day" id="math-text">날짜를 선택하세요</div>
+            <div class="subject">📐 수학</div>
+            <div class="fire-zone"><div id="math-fire" class="fire-ball state-none"></div></div>
+            <div class="date-input"><input type="date" id="math-date" onchange="calculate('math')"></div>
+            <div id="math-text" class="dday-text">날짜를 설정하세요</div>
         </div>
 
         <div class="card">
-            <div class="subject-name">🔤 영어</div>
-            <div class="fire-container">
-                <div id="eng-fire" class="fire none"></div>
-            </div>
-            <div class="input-group">
-                <input type="date" id="eng-date" onchange="updateDday('eng')">
-            </div>
-            <div class="d-day" id="eng-text">날짜를 선택하세요</div>
+            <div class="subject">🔤 영어</div>
+            <div class="fire-zone"><div id="eng-fire" class="fire-ball state-none"></div></div>
+            <div class="date-input"><input type="date" id="eng-date" onchange="calculate('eng')"></div>
+            <div id="eng-text" class="dday-text">날짜를 설정하세요</div>
         </div>
     </div>
 
     <script>
-        function updateDday(subject) {
-            const dateInput = document.getElementById(`${subject}-date`).value;
-            const fireDiv = document.getElementById(`${subject}-fire`);
-            const textDiv = document.getElementById(`${subject}-text`);
+        function calculate(sub) {
+            var inputVal = document.getElementById(sub + '-date').value;
+            var fireEl = document.getElementById(sub + '-fire');
+            var textEl = document.getElementById(sub + '-text');
 
-            if (!dateInput) {
-                fireDiv.className = "fire none";
-                textDiv.innerText = "날짜를 선택하세요";
-                textDiv.style.color = "#fff";
+            if (!inputVal) {
+                fireEl.className = "fire-ball state-none";
+                textEl.innerText = "날짜를 설정하세요";
+                textEl.style.color = "#fff";
                 return;
             }
 
-            const today = new Date();
-            today.setHours(0, 0, 0, 0); 
-            const targetDate = new Date(dateInput);
-            targetDate.setHours(0, 0, 0, 0);
+            var today = new Date();
+            today.setHours(0,0,0,0);
+            var target = new Date(inputVal);
+            target.setHours(0,0,0,0);
 
-            const diffTime = targetDate - today;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            var diff = target.getTime() - today.getTime();
+            var days = Math.ceil(diff / (1000 * 60 * 60 * 24));
 
-            // 클래스 초기화 후 새로 지정
-            fireDiv.className = "fire";
+            // 모든 상태 클래스 초기화
+            fireEl.className = "fire-ball";
 
-            if (diffDays > 7) {
-                fireDiv.classList.add("safe");
-                textDiv.innerText = `D-${diffDays} (여유)`;
-                textDiv.style.color = "#00ffaa";
-            } else if (diffDays <= 7 && diffDays > 3) {
-                fireDiv.classList.add("warning");
-                textDiv.innerText = `D-${diffDays} (준비 필요!)`;
-                textDiv.style.color = "#ff9900";
-            } else if (diffDays <= 3 && diffDays >= 0) {
-                fireDiv.classList.add("danger");
-                textDiv.innerText = diffDays === 0 ? "D-Day 🔥 오늘 마감!" : `D-${diffDays} (코앞임!)`;
-                textDiv.style.color = "#ff3300";
+            if (days > 7) {
+                fireEl.classList.add("state-safe");
+                textEl.innerText = "D-" + days + " (여유)";
+                textEl.style.color = "#00ffaa";
+            } else if (days <= 7 && days > 3) {
+                fireEl.classList.add("state-warning");
+                textEl.innerText = "D-" + days + " (경고)";
+                textEl.style.color = "#ff9900";
+            } else if (days <= 3 && days >= 0) {
+                fireEl.classList.add("state-danger");
+                textEl.innerText = days === 0 ? "D-Day (오늘 마감!)" : "D-" + days + " (위험!)";
+                textEl.style.color = "#ff3300";
             } else {
-                fireDiv.classList.add("expired");
-                textDiv.innerText = "마감됨";
-                textDiv.style.color = "#888";
+                fireEl.classList.add("state-end");
+                textEl.innerText = "마감됨";
+                textEl.style.color = "#888";
             }
         }
     </script>
