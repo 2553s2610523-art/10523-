@@ -2,126 +2,103 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>수행평가 알림이</title>
     <style>
-        body {
-            font-family: sans-serif;
-            background-color: #121212;
-            color: #ffffff;
-            text-align: center;
-            padding: 20px;
-        }
-        h1 { color: #ffcc00; }
-        .container {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-            margin-top: 30px;
-        }
-        .card {
-            background-color: #1e1e1e;
-            border: 1px solid #333;
-            border-radius: 12px;
-            padding: 20px;
-            width: 240px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-        .subject { font-size: 1.4rem; font-weight: bold; margin-bottom: 15px; }
+        body { background-color: #121212; color: white; font-family: sans-serif; text-align: center; padding: 20px; }
+        .container { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
+        .card { background-color: #222; border: 2px solid #444; border-radius: 10px; padding: 20px; width: 220px; }
+        .subject { font-size: 24px; font-weight: bold; }
         
-        /* 불꽃 표시 영역 */
-        .fire-zone {
-            height: 120px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            margin-bottom: 15px;
-        }
-        .fire-ball {
-            border-radius: 50% 50% 20% 50%;
-            transform: rotate(-45deg);
-            transition: all 0.3s ease;
+        /* 불빛이 들어올 상자 */
+        .light-box { 
+            width: 100px; height: 100px; 
+            margin: 20px auto; 
+            border-radius: 10px; 
+            background-color: #444; /* 기본은 회색 */
+            font-size: 40px;
+            line-height: 100px;
+            transition: 0.3s;
         }
         
-        /* 상태별 불꽃 (크기, 색상, 그림자) */
-        .state-none { width: 30px; height: 30px; background-color: #444; border-radius: 50%; transform: none; }
-        .state-safe { width: 40px; height: 40px; background-color: #00ffaa; box-shadow: 0 0 15px #00ffaa; }
-        .state-warning { width: 70px; height: 70px; background-color: #ff9900; box-shadow: 0 0 25px #ff9900; }
-        .state-danger { width: 100px; height: 100px; background-color: #ff3300; box-shadow: 0 0 40px #ff3300; }
-        .state-end { width: 30px; height: 30px; background-color: #555; border-radius: 50%; transform: none; }
-
-        .date-input { margin-top: 15px; }
-        input[type="date"] { padding: 6px; font-size: 0.9rem; border-radius: 4px; border: none; }
-        .dday-text { font-size: 1.1rem; font-weight: bold; margin-top: 15px; }
+        input[type="date"] { padding: 5px; font-size: 16px; width: 80%; }
+        .dday-text { font-size: 18px; font-weight: bold; margin-top: 15px; }
     </style>
 </head>
 <body>
 
-    <h1>🔥 수행평가 알림이</h1>
-    <p>날짜를 입력하면 불꽃의 크기와 색상이 변합니다.</p>
+    <h1>🔥 수행평가 마감 알림이 🔥</h1>
+    <p>과목별 마감일을 선택하면 불의 크기와 색이 바뀝니다.</p>
 
     <div class="container">
         <div class="card">
             <div class="subject">📚 국어</div>
-            <div class="fire-zone"><div id="ko-fire" class="fire-ball state-none"></div></div>
-            <div class="date-input"><input type="date" id="ko-date" onchange="calculate('ko')"></div>
-            <div id="ko-text" class="dday-text">날짜를 설정하세요</div>
+            <div id="ko-light" class="light-box">💤</div>
+            <input type="date" id="ko-date" onchange="checkDday('ko')">
+            <div id="ko-text" class="dday-text">날짜를 선택하세요</div>
         </div>
 
         <div class="card">
             <div class="subject">📐 수학</div>
-            <div class="fire-zone"><div id="math-fire" class="fire-ball state-none"></div></div>
-            <div class="date-input"><input type="date" id="math-date" onchange="calculate('math')"></div>
-            <div id="math-text" class="dday-text">날짜를 설정하세요</div>
+            <div id="math-light" class="light-box">💤</div>
+            <input type="date" id="math-date" onchange="checkDday('math')">
+            <div id="math-text" class="dday-text">날짜를 선택하세요</div>
         </div>
 
         <div class="card">
             <div class="subject">🔤 영어</div>
-            <div class="fire-zone"><div id="eng-fire" class="fire-ball state-none"></div></div>
-            <div class="date-input"><input type="date" id="eng-date" onchange="calculate('eng')"></div>
-            <div id="eng-text" class="dday-text">날짜를 설정하세요</div>
+            <div id="eng-light" class="light-box">💤</div>
+            <input type="date" id="eng-date" onchange="checkDday('eng')">
+            <div id="eng-text" class="dday-text">날짜를 선택하세요</div>
         </div>
     </div>
 
     <script>
-        function calculate(sub) {
-            var inputVal = document.getElementById(sub + '-date').value;
-            var fireEl = document.getElementById(sub + '-fire');
-            var textEl = document.getElementById(sub + '-text');
+        function checkDday(subject) {
+            var dateVal = document.getElementById(subject + '-date').value;
+            var lightEl = document.getElementById(subject + '-light');
+            var textEl = document.getElementById(subject + '-text');
 
-            if (!inputVal) {
-                fireEl.className = "fire-ball state-none";
-                textEl.innerText = "날짜를 설정하세요";
-                textEl.style.color = "#fff";
-                return;
-            }
+            if (!dateVal) return;
 
+            // 날짜 계산
             var today = new Date();
             today.setHours(0,0,0,0);
-            var target = new Date(inputVal);
+            var target = new Date(dateVal);
             target.setHours(0,0,0,0);
 
             var diff = target.getTime() - today.getTime();
             var days = Math.ceil(diff / (1000 * 60 * 60 * 24));
 
-            // 모든 상태 클래스 초기화
-            fireEl.className = "fire-ball";
-
+            // 조건에 따라 불 크기(폰트 크기)와 색상 변경
             if (days > 7) {
-                fireEl.classList.add("state-safe");
-                textEl.innerText = "D-" + days + " (여유)";
+                // 7일 초과 : 안전 (작은 초록 불)
+                lightEl.style.backgroundColor = "#00ffaa";
+                lightEl.style.fontSize = "25px"; 
+                lightEl.innerText = "🌱";
+                textEl.innerText = "D-" + days + " (안전)";
                 textEl.style.color = "#00ffaa";
-            } else if (days <= 7 && days > 3) {
-                fireEl.classList.add("state-warning");
-                textEl.innerText = "D-" + days + " (경고)";
+            } 
+            else if (days <= 7 && days > 3) {
+                // 4일~7일 : 경고 (중간 주황 불)
+                lightEl.style.backgroundColor = "#ff9900";
+                lightEl.style.fontSize = "50px"; 
+                lightEl.innerText = "🔥";
+                textEl.innerText = "D-" + days + " (주의!)";
                 textEl.style.color = "#ff9900";
-            } else if (days <= 3 && days >= 0) {
-                fireEl.classList.add("state-danger");
-                textEl.innerText = days === 0 ? "D-Day (오늘 마감!)" : "D-" + days + " (위험!)";
+            } 
+            else if (days <= 3 && days >= 0) {
+                // 0일~3일 : 위험 (거대한 빨간 불)
+                lightEl.style.backgroundColor = "#ff3300";
+                lightEl.style.fontSize = "80px"; 
+                lightEl.innerText = "💥";
+                textEl.innerText = days === 0 ? "D-Day (오늘 마감!)" : "D-" + days + " (위험!!!)";
                 textEl.style.color = "#ff3300";
-            } else {
-                fireEl.classList.add("state-end");
+            } 
+            else {
+                // 마감 지난 경우
+                lightEl.style.backgroundColor = "#555";
+                lightEl.style.fontSize = "30px";
+                lightEl.innerText = "❌";
                 textEl.innerText = "마감됨";
                 textEl.style.color = "#888";
             }
