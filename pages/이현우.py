@@ -16,7 +16,7 @@ if "id_counter" not in dt.session_state:
     dt.session_state.id_counter = 1
 
 # 앱 헤더
-dt.title("🎒 예정된 수행평가 알림장")
+dt.title("🎒 과학·과탐·기가 수행평가 알림장")
 dt.markdown("과학 · 과학탐구실험 · 기술·가정 과목의 수행평가를 관리하는 공간입니다.")
 dt.markdown("---")
 
