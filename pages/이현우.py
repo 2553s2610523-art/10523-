@@ -93,7 +93,7 @@ with dt.form("add_form", clear_on_submit=True):
     
     if submit_button:
         if not title.strip():
-            dt.error("수행평가 이름을 입력해주세요!")
+            dt.error("수행평가 이름을 입력해주세요")
         else:
             new_data = {
                 "id": dt.session_state.id_counter,
@@ -104,5 +104,5 @@ with dt.form("add_form", clear_on_submit=True):
             }
             dt.session_state.evaluations.append(new_data)
             dt.session_state.id_counter += 1
-            dt.toast(f"✅ {subject} 수행평가가 등록되었습니다!", icon="🎉")
+            dt.toast(f"✅ {subject} 수행평가가 등록되었습니다", icon="🎉")
             dt.rerun()
