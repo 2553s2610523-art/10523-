@@ -89,7 +89,7 @@ with dt.form("add_form", clear_on_submit=True):
     title = dt.text_input("수행평가 이름")
     content = dt.text_area("세부 내용")
     
-    submit_button = dt.form_submit_button("📅 일정 등록하기", use_container_width=True)
+    submit_button = dt.form_submit_button("일정 등록하기", use_container_width=True)
     
     if submit_button:
         if not title.strip():
