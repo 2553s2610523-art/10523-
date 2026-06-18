@@ -1,7 +1,6 @@
-import streamlit as pd
 import streamlit as st
 
-# 1. 페이지 기본 설정 (웹 브라우저 탭에 표시될 내용)
+# 1. 페이지 기본 설정
 st.set_page_config(
     page_title="고등학교 수행평가 알림이",
     page_icon="📅",
@@ -41,7 +40,6 @@ st.markdown("""
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         text-align: center;
         margin-bottom: 20px;
-        transition: transform 0.2s;
     }
     
     /* 안내 문구 스타일 */
@@ -53,13 +51,13 @@ st.markdown("""
         margin-bottom: 20px;
     }
     </style>
-""", unsafe_index=True)
+""", unsafe_allow_html=True)
 
 # 3. 세션 상태(Session State)를 이용한 페이지 전환 초기화
 if 'current_page' not in st.session_state:
     st.session_state.current_page = 'Main'
 
-# --- 쌤이 임의로 작성한 샘플 데이터 (실제 일정에 맞게 수정 가능!) ---
+# --- 샘플 데이터 ---
 subjects_data = {
     "국어": {"date": "2026-07-02", "content": "현대시 분석 및 비평문 작성 (지필 포함)", "status": "🔴 마감 임박"},
     "수학": {"date": "2026-06-25", "content": "미분계수의 기하학적 의미 탐구 보고서 제출", "status": "🟡 진행 중"},
@@ -82,10 +80,9 @@ if st.session_state.current_page == 'Main':
     st.markdown("<div class='main-title'>📅 수행평가 알림이</div>", unsafe_allow_html=True)
     st.markdown("<div class='sub-title'>과목을 선택하면 상세 수행평가 일정과 내용을 확인할 수 있습니다.</div>", unsafe_allow_html=True)
     
-    # 요청하신 12개 과목 리스트
     subjects = ["국어", "수학", "과학", "과학탐구", "사회", "음악", "체육", "미술", "한국사", "기가", "정보", "영어"]
     
-    # 4열 레이아웃으로 이쁘게 배치
+    # 4열 레이아웃 배치
     cols = st.columns(4)
     
     for idx, subject in enumerate(subjects):
@@ -97,7 +94,7 @@ if st.session_state.current_page == 'Main':
                 </div>
             """, unsafe_allow_html=True)
             
-            # 카드가 버튼 역할을 하도록 하단에 Streamlit 버튼 배치
+            # 버튼 클릭 시 해당 과목 페이지로 이동
             if st.button(f"{subject} 일정 보기", key=f"btn_{subject}", use_container_width=True):
                 st.session_state.current_page = subject
                 st.rerun()
@@ -108,7 +105,6 @@ if st.session_state.current_page == 'Main':
 else:
     chosen_sub = st.session_state.current_page
     
-    # 메인으로 돌아가기 버튼
     if st.button("⬅️ 메인 화면으로 돌아가기", use_container_width=False):
         st.session_state.current_page = 'Main'
         st.rerun()
@@ -116,10 +112,8 @@ else:
     st.write("---")
     st.title(f"📚 {chosen_sub} 수행평가 상세 일정")
     
-    # 해당 과목 데이터 가져오기
     info = subjects_data.get(chosen_sub, {"date": "미정", "content": "등록된 수행평가 정보가 없습니다.", "status": "🟢 정보 없음"})
     
-    # 상세 내용 레이아웃
     st.markdown(f"""
         <div class='info-box'>
             <h4>📌 진행 상태: {info['status']}</h4>
@@ -133,5 +127,4 @@ else:
         st.subheader("📝 수행평가 내용")
         st.info(info['content'])
         
-    # 추가 팁이나 주의사항 적는 공간
     st.warning("⚠️ 수행평가 일정은 학교 사정에 따라 변경될 수 있으니 항상 공지사항을 재확인하세요!")
