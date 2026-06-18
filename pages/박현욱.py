@@ -13,7 +13,7 @@ st.set_page_config(
 st.title("🎨🎵🏃‍♂️ 예체능 수행평가 알리미")
 st.markdown("미술, 음악, 체육 과목의 수행평가 일정과 준비물을 놓치지 않게 도와주는 알리미입니다.")
 
-# 샘플 데이터 생성 (실제 학교 일정에 맞게 수정 가능)
+# 샘플 데이터 생성
 @st.cache_data
 def load_data():
     data = {
@@ -59,33 +59,5 @@ filtered_df["남은 기간"] = filtered_df["D-Day"].apply(format_dday)
 # 메인 화면 구성
 st.subheader("📅 수행평가 일정표")
 
-# 표 출력을 위해 날짜 형식 깔끔하게 변경
-display_df = filtered_df.copy()
-display_df["마감일"] = display_df["마감일"].dt.strftime("%Y-%m-%d")
-
-# 불필요한 D-Day 숫자 컬럼은 제외하고 보여주기
-st.dataframe(
-    display_df[["과목", "평가 항목", "마감일", "남은 기간", "반영 비율", "준비물/참고사항"]],
-    use_container_width=True,
-    hide_index=True
-)
-
----
-
-# 주요 일정 하이라이트 (카드 형태)
-st.subheader("🚨 다가오는 가장 급한 수행평가")
-urgent_tasks = filtered_df[filtered_df["D-Day"] >= 0].head(3)
-
-if not urgent_tasks.empty():
-    cols = st.columns(len(urgent_tasks))
-    for idx, (_, row) in enumerate(urgent_tasks.iterrows()):
-        with cols[idx]:
-            st.info(f"**[{row['과목']}] {row['평가 항목']}**\n\n⏰ **{row['남은 기간']}** ({row['마감일'].strftime('%m/%d')})")
-else:
-    st.success("🎉 현재 남은 수행평가가 없습니다! 편하게 쉬세요.")
-
-# 간단한 체크리스트 기능 추가
-st.subheader("✅ 나의 준비 체크리스트")
-todo_list = ["미술 붓 세척해두기", "음악 가사 다 외웠는지 확인", "체육 수행평가 전 스트레칭"]
-for todo in todo_list:
-    st.checkbox(todo)1
+# 표 출력을 위해 날짜 형식 변경
+display_df = filtered
