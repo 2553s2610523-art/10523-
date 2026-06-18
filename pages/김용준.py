@@ -1,14 +1,13 @@
-
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>🔥 수행평가 알리미</title>
+<title>🔥 수행평가 비상 알리미</title>
 
 <style>
 body{
-    font-family: Arial, sans-serif;
+    font-family:sans-serif;
     background:#111;
     color:white;
     padding:20px;
@@ -22,35 +21,17 @@ h1{
     padding:20px;
     margin:15px 0;
     border-radius:15px;
-    transition:0.5s;
 }
 
-.safe{
-    background:#2ecc71;
-}
-
-.warn{
-    background:#f1c40f;
-    color:black;
-}
-
-.danger{
-    background:#e67e22;
-}
-
+.safe{background:#2ecc71;}
+.warn{background:#f1c40f;color:black;}
+.danger{background:#e67e22;}
 .fire{
     background:#e74c3c;
     animation:pulse 1s infinite;
 }
-
 .burning{
-    background:linear-gradient(
-    45deg,
-    #ff0000,
-    #ff6600,
-    #ffff00,
-    #ff6600,
-    #ff0000);
+    background:linear-gradient(45deg,#ff0000,#ff6600,#ffff00,#ff6600,#ff0000);
     background-size:400% 400%;
     animation:fireAnimation 1s infinite;
 }
@@ -68,6 +49,7 @@ h1{
 }
 </style>
 </head>
+
 <body>
 
 <h1>🔥 수행평가 비상 알리미 🔥</h1>
@@ -79,58 +61,58 @@ h1{
 const evaluations = [
 {
 subject:"국어 수행평가",
-date:"2026-06-25"
+date:"2026/06/25"
 },
 {
 subject:"영어 수행평가",
-date:"2026-06-22"
+date:"2026/06/22"
 },
 {
 subject:"수학 수행평가",
-date:"2026-06-19"
+date:"2026/06/19"
 }
 ];
 
-const today = new Date();
+const container = document.getElementById("tasks");
 
-evaluations.forEach(item=>{
+evaluations.forEach(item => {
 
-const due = new Date(item.date);
-const dday = Math.ceil(
-(due-today)/(1000*60*60*24)
-);
+    const today = new Date();
+    const due = new Date(item.date);
 
-let level="safe";
-let emoji="🟢";
+    const diffTime = due.getTime() - today.getTime();
+    const dday = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-if(dday<=6){
-level="warn";
-emoji="🟡";
-}
+    let level = "safe";
+    let emoji = "🟢";
 
-if(dday<=3){
-level="danger";
-emoji="🟠";
-}
+    if(dday <= 6){
+        level = "warn";
+        emoji = "🟡";
+    }
 
-if(dday<=1){
-level="fire";
-emoji="🔥";
-}
+    if(dday <= 3){
+        level = "danger";
+        emoji = "🟠";
+    }
 
-if(dday<=0){
-level="burning";
-emoji="🚨🔥";
-}
+    if(dday <= 1){
+        level = "fire";
+        emoji = "🔥";
+    }
 
-document.getElementById("tasks").innerHTML += `
-<div class="${level} task">
-<h2>${emoji} ${item.subject}</h2>
-<p>마감일 : ${item.date}</p>
-<p>D-${dday}</p>
-</div>
-`;
+    if(dday <= 0){
+        level = "burning";
+        emoji = "🚨🔥";
+    }
 
+    container.innerHTML += `
+        <div class="task ${level}">
+            <h2>${emoji} ${item.subject}</h2>
+            <p>마감일: ${item.date}</p>
+            <p>D-${Math.max(dday,0)}</p>
+        </div>
+    `;
 });
 
 </script>
