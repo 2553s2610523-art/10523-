@@ -1,4 +1,4 @@
-  import streamlit as st
+import streamlit as st
 
 # 1. 페이지 기본 설정 (에러 방지를 위해 가장 최상단에 배치)
 st.set_page_config(
