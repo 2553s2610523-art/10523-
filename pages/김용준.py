@@ -1,77 +1,104 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import streamlit as st
+import datetime
 
-export default function App() {
-  // 과목 선택 상태 (기본값: 국어)
-  const [selectedSubject, setSelectedSubject] = useState('국어');
-  
-  // 과목별 남은 일수 데이터 (예시)
-  const assignmentDays = {
-    '국어': 8,  // 7일 이상 남음 (잔잔함)
-    '수학': 4,  // 3~6일 남음 (조금 셈)
-    '영어': 1,  // 1~2일 남음 (매우 거침)
-  };
+# 페이지 기본 설정
+st.set_page_config(
+    page_title="수행평가 알리미",
+    page_icon="🔥",
+    layout="centered"
+)
 
-  // 남은 일수에 따라 다른 불꽃 이미지나 스타일을 반환하는 함수
-  const getFlameEffect = (days) => {
-    if (days >= 7) {
-      return { text: "🔥 잔잔한 불꽃 (여유 있음)", color: "#FFCC00", scale: 1.0 };
-    } else if (days >= 3) {
-      return { text: "🔥🔥 거세지는 불꽃 (준비 필요!)", color: "#FF6600", scale: 1.5 };
-    } else {
-      return { text: "💥💥💥 폭발하는 불꽃 (당장 하세요!)", color: "#FF0000", scale: 2.3 };
+# 스트림릿 자체에서 폭죽 효과를 내기 위한 컴포넌트 호출 함수
+def trigger_celebration():
+    st.balloons()  # 기본 풍선 효과
+    st.snow()      # 축하 효과를 위한 추가 시각 효과
+
+# 앱 제목
+st.title("📚 국어·수학·영어 수행평가 알리미")
+st.markdown("---")
+
+# 세션 상태(Session State)를 활용해 과목별 마감일 초기화 (테스트용 기본값 설정)
+if 'dates' not in st.session_state:
+    today = datetime.date.today()
+    st.session_state.dates = {
+        "국어": today + datetime.timedelta(days=8),  # 8일 남음 (잔잔함)
+        "수학": today + datetime.timedelta(days=3),  # 3일 남음 (거셈)
+        "영어": today,                               # 오늘 마감 (폭죽 및 폭발)
     }
-  };
 
-  const currentDays = assignmentDays[selectedSubject];
-  const flame = getFlameEffect(currentDays);
+# 1. 과목 선택 탭 생성
+tab1, tab2, tab3 = st.tabs(["📝 국어", "📐 수학", "🔤 영어"])
 
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>수행평가 알리미</Text>
-      
-      {/* 과목 선택 버튼 */}
-      <View style={styles.tabContainer}>
-        {['국어', '수학', '영어'].map((subject) => (
-          <TouchableOpacity 
-            key={subject} 
-            style={[styles.tab, selectedSubject === subject && styles.activeTab]}
-            onPress={() => setSelectedSubject(subject)}
-          >
-            <Text style={styles.tabText}>{subject}</Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* 정보 표시 영역 */}
-      <View style={styles.infoBox}>
-        <Text style={styles.subjectText}>{selectedSubject} 수행평가</Text>
-        <Text style={styles.ddayText}>D-{currentDays}</Text>
+def render_subject_ui(subject_name):
+    st.subheader(f"{subject_name} 수행평가 상태")
+    
+    # 마감일 수정 기능
+    chosen_date = st.date_input(
+        f"{subject_name} 마감일 변경", 
+        st.session_state.dates[subject_name],
+        key=f"date_{subject_name}"
+    )
+    st.session_state.dates[subject_name] = chosen_date
+    
+    # 디데이 계산
+    today = datetime.date.today()
+    remaining_days = (chosen_date - today).days
+    
+    # 디데이 및 불꽃 효과 조건문
+    if remaining_days < 0:
+        st.error(f"지나간 수행평가입니다. (종료된 지 {abs(remaining_days)}일째)")
+        st.markdown("<h1 style='text-align: center; color: #555555;'>⚫ 재만 남은 불꽃</h1>", unsafe_allow_html=True)
         
-        {/* 불꽃 시각 효과 영역 */}
-        <View style={[
-          styles.flameCircle, 
-          { backgroundColor: flame.color, transform: [{ scale: flame.scale }] }
-        ]}>
-          {/* 실제 앱에서는 여기에 크기별 불꽃 GIF나 애니메이션 lottie 파일을 넣으면 됩니다 */}
-        </View>
+    elif remaining_days == 0:
+        st.success("🎉 오늘이 마감일입니다! 파이팅! 🎉")
+        st.markdown("<h1 style='text-align: center; font-size: 80px; animation: blink 1s infinite;'>💥</h1>", unsafe_allow_html=True)
+        st.markdown("<h3 style='text-align: center; color: #FF3333;'>당장 제출하세요! 폭발하는 불꽃</h3>", unsafe_allow_html=True)
+        # 당일이 되면 폭죽 효과 실행
+        trigger_celebration()
         
-        <Text style={styles.statusText}>{flame.text}</Text>
-      </View>
-    </View>
-  );
-}
+    elif remaining_days <= 2:
+        st.warning(f"⚠️ 마감 임박! D-{remaining_days}")
+        # HTML/CSS를 이용해 크고 거친 불꽃 시각화 (크기 70px, 그림자 강하게)
+        st.markdown(
+            f"""
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 20px 0;">
+                <div style="font-size: 70px; text-shadow: 0 0 30px #FF3333, 0 0 50px #FF6600; animation: pulse 0.5s infinite alternate;">🔥</div>
+                <h4 style="color: #FF3333; margin-top: 10px;">💥💥💥 위태롭고 거칠게 타오르는 폭발 직전!</h4>
+            </div>
+            """, 
+            unsafe_allow_html=True
+        )
+        
+    elif remaining_days <= 6:
+        st.info(f"💡 준비 시작하세요! D-{remaining_days}")
+        # 중간 크기 불꽃 (크기 45px, 그림자 중간)
+        st.markdown(
+            f"""
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 20px 0;">
+                <div style="font-size: 45px; text-shadow: 0 0 15px #FF6600;">🔥</div>
+                <h4 style="color: #FF6600; margin-top: 10px;">🔥🔥 거세고 흔들리는 불꽃!</h4>
+            </div>
+            """, 
+            unsafe_allow_html=True
+        )
+        
+    else:
+        st.info(f"✅ 아직 여유가 있습니다. D-{remaining_days}")
+        # 작은 불꽃 (크기 25px)
+        st.markdown(
+            f"""
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 20px 0;">
+                <div style="font-size: 25px; text-shadow: 0 0 5px #FFCC00;">🔥</div>
+                <h4 style="color: #FFCC00; margin-top: 10px;">🔥 잔잔하고 안정적인 불꽃</h4>
+            </div>
+            """, 
+            unsafe_allow_html=True
+        )
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#121212', padding: 20, justifyContent: 'center' },
-  title: { fontSize: 28, color: '#fff', fontWeight: 'bold', textAlign: 'center', marginBottom: 30 },
-  tabContainer: { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 40 },
-  tab: { padding: 12, borderRadius: 8, backgroundColor: '#333', width: '25%', alignItems: 'center' },
-  activeTab: { backgroundColor: '#ff4757' },
-  tabText: { color: '#fff', fontWeight: 'bold' },
-  infoBox: { alignItems: 'center', backgroundColor: '#1e1e1e', padding: 30, borderRadius: 16 },
-  subjectText: { fontSize: 22, color: '#aaa', marginBottom: 10 },
-  ddayText: { fontSize: 40, color: '#fff', fontWeight: 'bold', marginBottom: 30 },
-  flameCircle: { width: 60, height: 60, borderRadius: 30, marginBottom: 40, justifyContent: 'center', alignItems: 'center' },
-  statusText: { fontSize: 18, color: '#fff', marginTop: 20, fontWeight: 'bold' }
-});
+# 각 탭에 UI 렌더링
+with tab1:
+    render_subject_ui("국어")
+with tab2:
+    render_subject_ui("수학")
+with tab3:
+    render_subject_ui("영어")
