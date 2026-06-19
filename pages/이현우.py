@@ -60,7 +60,7 @@ else:
                 st.markdown(f"### {emoji} [{item['subject']}] {item['title']}")
             with btn_col:
                 if st.button("🗑️ 삭제", key=f"del_{item['id']}"):
-                    st.session_state.evaluations = [e for e in dt.session_state.evaluations if e['id'] != item['id']]
+                    st.session_state.evaluations = [e for e in st.session_state.evaluations if e['id'] != item['id']]
                     st.toast("선택한 일정을 삭제했습니다.", icon="🗑️")
                     st.rerun()
             
